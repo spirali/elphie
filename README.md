@@ -10,6 +10,7 @@ Example: [example.pdf](example/example.pdf), [example.py](example/example.py)
 * Python 3.2 or newer
 * Inkscape
 * pdftk
+* pygments
 
 # Installation
 
