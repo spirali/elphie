@@ -7,6 +7,14 @@ from elphie.highlight import highlight_code
 from copy import deepcopy
 
 
+def normalize_show(value):
+    if isinstance(value, int):
+        return (value, None)
+    if isinstance(value, tuple) and len(value) == 2:
+        return value
+    raise Exception("Invalid show value: '{}'".format(repr(value)))
+
+
 class Element:
 
     childs = ()
@@ -15,18 +23,15 @@ class Element:
         self.show = show
 
     def get_max_step(self):
-        if isinstance(self.show, int):
-            return self.show
-        if isinstance(self.show, tuple) and len(self.show) == 2:
-            return self.show[1]
-        raise Exception("Invalid show value: '{}'".format(repr(self.show)))
+        start, end = normalize_show(self.show)
+        if end is None:
+            return start
+        else:
+            return end
 
     def is_visible(self, ctx):
-        if isinstance(self.show, int):
-            return self.show <= ctx.step
-        if isinstance(self.show, tuple) and len(self.show) == 2:
-            return self.show[0] <= ctx.step <= self.show[1]
-        raise Exception("Invalid show value: '{}'".format(repr(self.show)))
+        start, end = normalize_show(self.show)
+        return start <= ctx.step and (end is None or ctx.step <= end)
 
     def render(self, ctx, rect):
         if self.is_visible(ctx):
@@ -167,13 +172,6 @@ def _parse_label(element):
 class Image(Element):
 
     def __init__(self, filename, scale, show):
-        if isinstance(show, int):
-            start_step = show
-        elif isinstance(show, tuple) and len(show) == 2:
-            start_step = show[1]
-        else:
-            raise Exception("Invalid show value")
-
         self.filename = filename
         self.root = et.parse(filename).getroot()
         self.scale = scale
@@ -183,6 +181,7 @@ class Image(Element):
             self.width *= scale
             self.height *= scale
 
+        global_start, global_end = normalize_show(show)
         inner_max_step = 1
         for element in self.root.iter():
             value = _parse_label(element)
@@ -194,9 +193,9 @@ class Image(Element):
             if max_step is not None and max_step >= inner_max_step:
                 inner_max_step = max_step
 
-        self.max_step = inner_max_step + start_step - 1
+        self.max_step = inner_max_step + global_start - 1
         self.has_inner_steps = inner_max_step > 1
-        self.start_step = start_step
+        self.start_step = global_start
         super().__init__(show)
 
     def get_max_step(self):
