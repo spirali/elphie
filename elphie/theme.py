@@ -18,6 +18,9 @@ class Theme:
     frame_title_text_color = "white"
     frame_bg_color = "#f2ffcb"
 
+    code_background_color = "#F0F0F0"
+    code_background_emph_color = "#96d820"
+
     def __init__(self):
         default_style = TextStyle()
         default_style.font = "Ubuntu"
@@ -173,8 +176,17 @@ class Theme:
         return SizeRequest(width, height, 1, 0)
 
     def render_code(self, ctx, rect, code):
-        ctx.renderer.draw_rect(rect, "#F0F0F0")
+        ctx.renderer.draw_rect(rect, self.code_background_color)
         style = self._get_text_style(ctx, "code")
+
+        for line_number, (start, end) in code.emphasis:
+            if start <= ctx.step and (end is None or ctx.step <= end):
+                offset_x, offset_y = self.get_text_offset(style)
+                line_size = style.size * style.line_spacing
+                y = rect.y + offset_y + line_size * (line_number - 1)
+                r = Rect(rect.x, y, rect.width, line_size + offset_y)
+                ctx.renderer.draw_rect(r, self.code_background_emph_color)
+
         self.draw_text(ctx.renderer, rect.x, rect.y, code.content, style)
 
     def gather_code_queries(self, ctx, queries, code):

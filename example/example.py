@@ -44,7 +44,7 @@ lst.item().text("Orange")
 lst.item().text("Banana")
 
 slide = slides.new_slide("Code")
-slide.code("""#include <stdio.h>
+code = slide.code("""#include <stdio.h>
 
 /* Hello world program */
 
@@ -52,6 +52,11 @@ int main() {
     printf("Hello world!\\n");
     return 0;
 }""", "c")
+code.line_emphasis(1, show=(2, 2))
+code.line_emphasis(5, show=3)
+code.line_emphasis(6, show=4)
+code.line_emphasis(7, show=5)
+
 
 slide = slides.new_slide("Columns")
 slide.text("Columns demonstration")

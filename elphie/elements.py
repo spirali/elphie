@@ -77,6 +77,19 @@ class Code(Element):
         super().__init__(show)
         self.content = highlight_code(code, language)
         self.language = language
+        self.emphasis = []
+
+    def get_max_step(self):
+        start, end = normalize_show(self.show)
+        ends = [start - 1 + (e if e is not None else s)
+                for line_number, (s, e) in self.emphasis]
+        ends.append(start)
+        if end:
+            ends.append(end)
+        return max(ends)
+
+    def line_emphasis(self, line_number, show):
+        self.emphasis.append((line_number, normalize_show(show)))
 
     def get_size_request(self, ctx):
         return ctx.theme.get_code_size_request(ctx, self)
