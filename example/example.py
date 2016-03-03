@@ -57,6 +57,16 @@ code.line_emphasis(5, show=3)
 code.line_emphasis(6, show=4)
 code.line_emphasis(7, show=5)
 
+slide = slides.new_slide("Shell")
+shell = slide.shell(
+    "~shell_prompt{/path/to/elphie/example$} ~shell_cmd{ls}\n"
+    "python3 example.py\n\n"
+    "~shell_prompt{/path/to/elphie/example$} ~shell_cmd{python3 example.py}\n"
+    "Preprocessing................. done\n"
+    "Building...................... done\n"
+    "Creating 'example.pdf'........ done\n")
+shell.line_emphasis(5, show=(2, 2))
+shell.line_emphasis(6, show=3)
 
 slide = slides.new_slide("Columns")
 slide.text("Columns demonstration")

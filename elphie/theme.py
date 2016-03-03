@@ -21,6 +21,9 @@ class Theme:
     code_background_color = "#F0F0F0"
     code_background_emph_color = "#96d820"
 
+    shell_background_color = "#101010"
+    shell_background_emph_color = "#76a810"
+
     def __init__(self):
         default_style = TextStyle()
         default_style.font = "Ubuntu"
@@ -32,10 +35,20 @@ class Theme:
         tt_style = TextStyle()
         tt_style.font = "Ubuntu Mono"
 
-        code_style = TextStyle()
+        code_style = default_style.copy()
         code_style.font = "Ubuntu Mono"
         code_style.align = "left"
         code_style.color = "#222"
+
+        shell_style = code_style.copy()
+        shell_style.color = "white"
+
+        shell_prompt_style = TextStyle()
+        shell_prompt_style.color = "#7070F0"
+
+        shell_cmd_style = TextStyle()
+        shell_cmd_style.color = "#F0F070"
+        shell_cmd_style.bold = True
 
         emph_style = TextStyle()
         emph_style.color = self.text_empth_color
@@ -73,6 +86,9 @@ class Theme:
             "h2": h2_style,
             "h3": h3_style,
             "code": code_style,
+            "shell": shell_style,
+            "shell_prompt": shell_prompt_style,
+            "shell_cmd": shell_cmd_style,
             "frame": frame_style,
             "frame_title": frame_title_style,
             "list_item": list_item_style
@@ -169,6 +185,23 @@ class Theme:
         query = self._get_text_size_query(ctx, text, text.content, text.role)
         queries.append(query)
 
+    # Shell
+
+    def get_shell_size_request(self, ctx, shell):
+        width, height = self._get_text_size(ctx, shell.content, "shell")
+        return SizeRequest(width, height, 1, 0)
+
+    def render_shell(self, ctx, rect, shell):
+        ctx.renderer.draw_rect(rect, self.shell_background_color)
+        style = self._get_text_style(ctx, "shell")
+        self._draw_line_emphasis(
+            ctx, rect, style, shell.emphasis, self.shell_background_emph_color)
+        self.draw_text(ctx.renderer, rect.x, rect.y, shell.content, style)
+
+    def gather_shell_queries(self, ctx, queries, shell):
+        query = self._get_text_size_query(ctx, shell, shell.content, "shell")
+        queries.append(query)
+
     # Code
 
     def get_code_size_request(self, ctx, code):
@@ -178,15 +211,8 @@ class Theme:
     def render_code(self, ctx, rect, code):
         ctx.renderer.draw_rect(rect, self.code_background_color)
         style = self._get_text_style(ctx, "code")
-
-        for line_number, (start, end) in code.emphasis:
-            if start <= ctx.step and (end is None or ctx.step <= end):
-                offset_x, offset_y = self.get_text_offset(style)
-                line_size = style.size * style.line_spacing
-                y = rect.y + offset_y + line_size * (line_number - 1)
-                r = Rect(rect.x, y, rect.width, line_size + offset_y)
-                ctx.renderer.draw_rect(r, self.code_background_emph_color)
-
+        self._draw_line_emphasis(
+            ctx, rect, style, code.emphasis, self.code_background_emph_color)
         self.draw_text(ctx.renderer, rect.x, rect.y, code.content, style)
 
     def gather_code_queries(self, ctx, queries, code):
@@ -350,6 +376,15 @@ class Theme:
             text = parse_text(text)
         style = self._get_text_style(ctx, role)
         return ctx.renderer.get_text_size_query(style, self.text_styles, text)
+
+    def _draw_line_emphasis(self, ctx, rect, style, emphasis, color):
+        for line_number, (start, end) in emphasis:
+            if start <= ctx.step and (end is None or ctx.step <= end):
+                offset_x, offset_y = self.get_text_offset(style)
+                line_size = style.size * style.line_spacing
+                y = rect.y + offset_y + line_size * (line_number - 1)
+                r = Rect(rect.x, y, rect.width, line_size + offset_y)
+                ctx.renderer.draw_rect(r, color)
 
     def _get_text_style(self, ctx, role):
         styles = [self.text_styles["default"]]

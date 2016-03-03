@@ -32,7 +32,7 @@ def parse_text(text, escape_char="~", begin_char="{", end_char="}"):
             result.append(("text", text[start:i]))
             i += 1
             start = i
-            while i < len(text) and text[i].isalpha():
+            while i < len(text) and text[i] != begin_char:
                 i += 1
             result.append(("begin", text[start:i]))
             i += 1

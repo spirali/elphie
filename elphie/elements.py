@@ -50,7 +50,26 @@ class Element:
         pass
 
 
-class Text(Element):
+class TextBase(Element):
+
+    def __init__(self, show):
+        super().__init__(show)
+        self.emphasis = []
+
+    def get_max_step(self):
+        start, end = normalize_show(self.show)
+        ends = [start - 1 + (e if e is not None else s)
+                for line_number, (s, e) in self.emphasis]
+        ends.append(start)
+        if end:
+            ends.append(end)
+        return max(ends)
+
+    def line_emphasis(self, line_number, show):
+        self.emphasis.append((line_number, normalize_show(show)))
+
+
+class Text(TextBase):
 
     def __init__(self, content, role, show):
         super().__init__(show)
@@ -71,25 +90,12 @@ class Text(Element):
         ctx.theme.gather_text_queries(ctx, queries, self)
 
 
-class Code(Element):
+class Code(TextBase):
 
     def __init__(self, code, language, show):
         super().__init__(show)
         self.content = highlight_code(code, language)
         self.language = language
-        self.emphasis = []
-
-    def get_max_step(self):
-        start, end = normalize_show(self.show)
-        ends = [start - 1 + (e if e is not None else s)
-                for line_number, (s, e) in self.emphasis]
-        ends.append(start)
-        if end:
-            ends.append(end)
-        return max(ends)
-
-    def line_emphasis(self, line_number, show):
-        self.emphasis.append((line_number, normalize_show(show)))
 
     def get_size_request(self, ctx):
         return ctx.theme.get_code_size_request(ctx, self)
@@ -99,6 +105,24 @@ class Code(Element):
 
     def _gather_queries(self, ctx, queries):
         ctx.theme.gather_code_queries(ctx, queries, self)
+
+
+class Shell(TextBase):
+
+    def __init__(self, content, show):
+        super().__init__(show)
+        self.content = parse_text(content)
+        self.show = show
+        self.size_cache = None
+
+    def get_size_request(self, ctx):
+        return ctx.theme.get_shell_size_request(ctx, self)
+
+    def render_body(self, ctx, rect):
+        ctx.theme.render_shell(ctx, rect, self)
+
+    def _gather_queries(self, ctx, queries):
+        ctx.theme.gather_shell_queries(ctx, queries, self)
 
 
 class Box(Element):
@@ -146,6 +170,11 @@ class Box(Element):
 
     def code(self, code, language, show=1):
         element = Code(code, language, show)
+        self.add(element)
+        return element
+
+    def shell(self, text, show=1):
+        element = Shell(text, show)
         self.add(element)
         return element
 
