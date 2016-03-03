@@ -76,12 +76,9 @@ class Text(TextBase):
         self.content = parse_text(content)
         self.role = role
         self.show = show
-        self.size_cache = None
 
     def get_size_request(self, ctx):
-        if self.size_cache is None:
-            self.size_cache = ctx.theme.get_text_size_request(ctx, self)
-        return self.size_cache
+        return ctx.theme.get_text_size_request(ctx, self)
 
     def render_body(self, ctx, rect):
         ctx.theme.render_text(ctx, rect, self)

@@ -182,7 +182,7 @@ class Theme:
         self.draw_text(ctx.renderer, x, rect.y, text.content, style)
 
     def gather_text_queries(self, ctx, queries, text):
-        query = self._get_text_size_query(ctx, text, text.content, text.role)
+        query = self._get_text_size_query(ctx, text.content, text.role)
         queries.append(query)
 
     # Shell
@@ -199,7 +199,7 @@ class Theme:
         self.draw_text(ctx.renderer, rect.x, rect.y, shell.content, style)
 
     def gather_shell_queries(self, ctx, queries, shell):
-        query = self._get_text_size_query(ctx, shell, shell.content, "shell")
+        query = self._get_text_size_query(ctx, shell.content, "shell")
         queries.append(query)
 
     # Code
@@ -216,7 +216,7 @@ class Theme:
         self.draw_text(ctx.renderer, rect.x, rect.y, code.content, style)
 
     def gather_code_queries(self, ctx, queries, code):
-        query = self._get_text_size_query(ctx, code, code.content, "code")
+        query = self._get_text_size_query(ctx, code.content, "code")
         queries.append(query)
 
     # Box
@@ -293,8 +293,7 @@ class Theme:
         frame.box.render(ctx, rect)
 
     def gather_frame_queries(self, ctx, queries, frame):
-        query = self._get_text_size_query(
-            ctx, frame, frame.title, "frame_title")
+        query = self._get_text_size_query(ctx, frame.title, "frame_title")
         queries.append(query)
 
     # Elements helping functions
@@ -371,7 +370,7 @@ class Theme:
         offset_x, offset_y = self.get_text_offset(style)
         return width + offset_x * 2, height + offset_y * 2
 
-    def _get_text_size_query(self, ctx, key, text, role):
+    def _get_text_size_query(self, ctx, text, role):
         if isinstance(text, str):
             text = parse_text(text)
         style = self._get_text_style(ctx, role)
