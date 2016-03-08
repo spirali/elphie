@@ -52,10 +52,21 @@ int main() {
     printf("Hello world!\\n");
     return 0;
 }""", "c")
+
 code.line_emphasis(1, show=(2, 2))
 code.line_emphasis(5, show=3)
 code.line_emphasis(6, show=4)
 code.line_emphasis(7, show=5)
+
+code = slide.code("""#include <stdio.h>
+
+/* Hello world program */
+
+int main() {
+    printf("Hello world!\\n");
+    return 0;
+}""", "c")
+code.text_style = elphie.TextStyle(size=20)
 
 slide = slides.new_slide("Shell")
 shell = slide.shell(
@@ -95,7 +106,11 @@ slide = slides.new_slide("Text styles")
 slide.h1("Header 1")
 slide.h2("Header 2")
 slide.h3("Header 3")
-slide.text("Normal text | ~tt{Type writer} | ~emph{emphasis} | ~alert{alert}")
+text = "Normal text | ~tt{Type writer} | ~emph{emphasis} | ~alert{alert}"
+slide.text(text)
+text = slide.text("Fixed size 15, ignore theme: " + text)
+text.text_style = elphie.TextStyle(size=15)
+
 
 slide = slides.new_slide("Proceduraly generated elements")
 

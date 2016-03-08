@@ -20,6 +20,11 @@ class TextStyle:
                   "bold",
                   "italic")
 
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            assert key in self.attributes
+            setattr(self, key, kwargs[key])
+
     def copy(self):
         return copy(self)
 

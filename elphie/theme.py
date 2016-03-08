@@ -35,7 +35,7 @@ class Theme:
         tt_style = TextStyle()
         tt_style.font = "Ubuntu Mono"
 
-        code_style = default_style.copy()
+        code_style = TextStyle()
         code_style.font = "Ubuntu Mono"
         code_style.align = "left"
         code_style.color = "#222"
@@ -394,6 +394,8 @@ class Theme:
                 styles.append(self.text_styles["list_item"])
         if role is not None:
             styles.append(self.text_styles[role])
+        if ctx.stack[-1].text_style:
+            styles.append(ctx.stack[-1].text_style)
         return merge(styles)
 
 

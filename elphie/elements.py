@@ -18,6 +18,7 @@ def normalize_show(value):
 class Element:
 
     childs = ()
+    text_style = None
 
     def __init__(self, show):
         self.show = show
