@@ -59,6 +59,8 @@ class Context(object):
 
 class Slides:
 
+    debug = False
+
     def __init__(self,
                  filename,
                  theme=None,
@@ -173,8 +175,9 @@ class Slides:
         self._show_progress("Building", count, len(contexts), last=True)
 
         # Clean old cached files
-        for filename in set(cached_pdf) - set(filenames):
-            os.remove(os.path.join(self.cache_dir, filename))
+        if not self.debug:
+            for filename in set(cached_pdf) - set(filenames):
+                os.remove(os.path.join(self.cache_dir, filename))
 
         # Join everything into one file
         self._show_progress("Creating '{}'".format(self.filename), first=True)
@@ -192,11 +195,12 @@ class Slides:
         ctx.renderer.begin(self.width, self.height)
         ctx.theme.render_slide(ctx)
         ctx.renderer.end()
-        """
-        filename = os.path.join(self.cache_dir,
-            "slide-{}-{}.svg".format(self.slides.index(ctx.slide), ctx.step))
-        ctx.renderer.write(filename)
-        """
+
+        if self.debug:
+            filename = os.path.join(self.cache_dir,
+                "slide-{}-{}.svg".format(self.slides.index(ctx.slide), ctx.step))
+            ctx.renderer.write(filename)
+
         string = ctx.renderer.to_string()
         h = hashlib.sha1()
         h.update(string.encode())
