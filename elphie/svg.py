@@ -88,7 +88,7 @@ class RendererSVG:
     def draw_image(self, svgstring, x, y, scale=1.0):
         self.xml.element("g")
         transform = ["translate({}, {})".format(x, y)]
-        if scale != 1.0 or scale is not None:
+        if scale != 1.0 and scale is not None:
             transform.append("scale({})".format(scale))
         self.xml.set("transform", " ".join(transform))
         self.xml.raw_text(svgstring)
