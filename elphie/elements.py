@@ -123,16 +123,27 @@ class Shell(TextBase):
         ctx.theme.gather_shell_queries(ctx, queries, self)
 
 
-class Box(Element):
+class Container(Element):
 
-    def __init__(self, role, show=1):
+    def __init__(self, show):
         super().__init__(show)
         self.elements = []
-        self.role = role
 
     @property
     def childs(self):
         return self.elements
+
+    def get_max_step(self):
+        steps = [element.get_max_step() for element in self.elements]
+        steps.append(super().get_max_step())
+        return max(steps)
+
+
+class Box(Container):
+
+    def __init__(self, role, show=1):
+        super().__init__(show)
+        self.role = role
 
     def add(self, element):
         self.elements.append(element)
@@ -187,11 +198,6 @@ class Box(Element):
     def render_body(self, ctx, rect):
         ctx.theme.render_box(ctx, rect, self)
 
-    def get_max_step(self):
-        steps = [element.get_max_step() for element in self.elements]
-        steps.append(super().get_max_step())
-        return max(steps)
-
 
 def _parse_label(element):
     label = element.get("{http://www.inkscape.org/namespaces/inkscape}label")
@@ -244,13 +250,14 @@ class Image(Element):
     def get_data(self, step):
         def remove_hidden_elements(element):
             for child in list(element):
-                value = _parse_label(element)
+                value = _parse_label(child)
                 if value is not None:
                     start, end = value
                     if step < start or (end is not None and step > end):
                         element.remove(child)
                         continue
-                remove_hidden_elements(child)
+                else:
+                    remove_hidden_elements(child)
 
         if not self.has_inner_steps:
             return et.tostring(self.root).decode()
@@ -317,16 +324,11 @@ class Frame(Element):
         ctx.theme.gather_frame_queries(ctx, queries, self)
 
 
-class Columns(Element):
+class Columns(Container):
 
     def __init__(self, show):
         super().__init__(show)
-        self.elements = []
         self.ratios = []
-
-    @property
-    def childs(self):
-        return self.elements
 
     def column(self, ratio=1, show=1):
         box = Box("list_item", show)

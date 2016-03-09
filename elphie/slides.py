@@ -107,6 +107,9 @@ class Slides:
             else:
                 progress = ""
             suffix = ""
+        if self.debug:
+            prefix = ""
+            suffix = "\n"
         name = name.ljust(30, ".")
         sys.stdout.write("{}{} {}{}".format(prefix, name, progress, suffix))
         sys.stdout.flush()
