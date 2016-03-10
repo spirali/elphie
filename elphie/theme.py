@@ -376,14 +376,17 @@ class Theme:
         style = self._get_text_style(ctx, role)
         return ctx.renderer.get_text_size_query(style, self.text_styles, text)
 
-    def _draw_line_emphasis(self, ctx, rect, style, emphasis, color):
-        for line_number, (start, end) in emphasis:
+    def _draw_line_emphasis(self, ctx, rect, style, emphasis, default_color):
+        for line_numbers, (start, end), color in emphasis:
             if start <= ctx.step and (end is None or ctx.step <= end):
-                offset_x, offset_y = self.get_text_offset(style)
-                line_size = style.size * style.line_spacing
-                y = rect.y + offset_y + line_size * (line_number - 1)
-                r = Rect(rect.x, y, rect.width, line_size + offset_y)
-                ctx.renderer.draw_rect(r, color)
+                if color is None:
+                    color = default_color
+                for line_number in line_numbers:
+                    offset_x, offset_y = self.get_text_offset(style)
+                    line_size = style.size * style.line_spacing
+                    y = rect.y + offset_y + line_size * (line_number - 1)
+                    r = Rect(rect.x, y, rect.width, line_size + offset_y)
+                    ctx.renderer.draw_rect(r, color)
 
     def _get_text_style(self, ctx, role):
         styles = [self.text_styles["default"]]

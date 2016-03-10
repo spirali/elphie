@@ -53,28 +53,51 @@ class Element:
 
 class TextBase(Element):
 
-    def __init__(self, show):
+    def __init__(self, show, text):
         super().__init__(show)
+        self.text = text
         self.emphasis = []
 
     def get_max_step(self):
         start, end = normalize_show(self.show)
         ends = [start - 1 + (e if e is not None else s)
-                for line_number, (s, e) in self.emphasis]
+                for line_number, (s, e), color in self.emphasis]
         ends.append(start)
         if end:
             ends.append(end)
         return max(ends)
 
-    def line_emphasis(self, line_number, show):
-        self.emphasis.append((line_number, normalize_show(show)))
+    def line_emphasis(self,
+                      line_numbers=None,
+                      show=1,
+                      color=None,
+                      prefix=None,
+                      infix=None):
+        if isinstance(line_numbers, int):
+            line_numbers = (line_numbers,)
+        elif line_numbers is None:
+            line_numbers = tuple(range(1, self.text.count("\n") + 2))
+        else:
+            line_numbers = tuple(line_numbers)
+
+        if prefix is not None:
+            lines = self.text.split("\n")
+            line_numbers = tuple(i for i in line_numbers
+                                 if lines[i - 1].lstrip().startswith(prefix))
+        if infix is not None:
+            lines = self.text.split("\n")
+            line_numbers = tuple(i for i in line_numbers
+                                 if infix in lines[i - 1])
+        if line_numbers:
+            self.emphasis.append((line_numbers, normalize_show(show), color))
 
 
 class Text(TextBase):
 
-    def __init__(self, content, role, show):
-        super().__init__(show)
-        self.content = parse_text(content)
+    def __init__(self, text, role, show):
+        text = text.strip()
+        super().__init__(show, text)
+        self.content = parse_text(text)
         self.role = role
         self.show = show
 
@@ -91,7 +114,8 @@ class Text(TextBase):
 class Code(TextBase):
 
     def __init__(self, code, language, show):
-        super().__init__(show)
+        code = code.strip()
+        super().__init__(show, code)
         self.content = highlight_code(code, language)
         self.language = language
 
@@ -107,9 +131,10 @@ class Code(TextBase):
 
 class Shell(TextBase):
 
-    def __init__(self, content, show):
-        super().__init__(show)
-        self.content = parse_text(content)
+    def __init__(self, text, show):
+        text = text.strip()
+        super().__init__(show, text)
+        self.content = parse_text(text)
         self.show = show
         self.size_cache = None
 

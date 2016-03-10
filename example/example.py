@@ -55,7 +55,7 @@ int main() {
 
 code.line_emphasis(1, show=(2, 2))
 code.line_emphasis(5, show=3)
-code.line_emphasis(6, show=4)
+code.line_emphasis(show=4, prefix="printf")
 code.line_emphasis(7, show=5)
 
 code = slide.code("""#include <stdio.h>
@@ -67,6 +67,7 @@ int main() {
     return 0;
 }""", "c")
 code.text_style = elphie.TextStyle(size=20)
+code.line_emphasis([5,6,7], show=6, color="#f0c080")
 
 slide = slides.new_slide("Shell")
 shell = slide.shell(
