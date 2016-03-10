@@ -67,7 +67,7 @@ int main() {
     return 0;
 }""", "c")
 code.text_style = elphie.TextStyle(size=20)
-code.line_emphasis([5,6,7], show=6, color="#f0c080")
+code.line_emphasis([5, 6, 7], show=6, color="#f0c080")
 
 slide = slides.new_slide("Shell")
 shell = slide.shell(

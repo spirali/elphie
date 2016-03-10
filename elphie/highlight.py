@@ -24,6 +24,7 @@ class ElphieFormatter(Formatter):
                 stream.append(("text", value))
                 stream.append(("end", None))
 
+
 def highlight_code(code, language):
     lexer = get_lexer_by_name(language)
     formatter = ElphieFormatter()
@@ -32,6 +33,7 @@ def highlight_code(code, language):
     if stream and stream[-1] == (("newline", None)):
         stream = stream[:-1]
     return normalize_tokens(stream)
+
 
 def make_style(style_name):
     results = {}
