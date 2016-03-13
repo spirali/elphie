@@ -106,16 +106,16 @@ class Theme:
         self.main_title_style.align = "center"
         self.main_title_style.size = 60
 
-    def draw_text(self, renderer, x, y, text, style):
+    def draw_text(self, ctx, x, y, text, style):
         if isinstance(text, str):
             text = parse_text(text)
         # ctx.renderer.draw_rect(rect, fill_color="blue")
         offset_x, offset_y = self.get_text_offset(style)
-        renderer.draw_text(x + offset_x,
-                           y + style.size + offset_y,
-                           text,
-                           style,
-                           self.text_styles)
+        ctx.renderer.draw_text(x + offset_x,
+                               y + style.size + offset_y,
+                               text,
+                               style,
+                               ctx.text_styles)
 
     def render_slide(self, ctx):
         slide = ctx.slide
@@ -134,7 +134,7 @@ class Theme:
             renderer.draw_rect(rect, self.minor_color)
             rect = Rect(0, height / 2 - style.size, width, style.size * 2)
             renderer.draw_rect(rect, self.major_color)
-            self.draw_text(ctx.renderer,
+            self.draw_text(ctx,
                            width / 2,
                            height / 2 - style.size * 0.8,
                            slide.title,
@@ -154,7 +154,7 @@ class Theme:
         rect = Rect(0, top - 10, width, 10)
         renderer.draw_rect(rect, self.minor_color)
 
-        self.draw_text(renderer, width - 40, 10,
+        self.draw_text(ctx, width - 40, 10,
                        ctx.slide.title, self.title_style)
         rect = Rect(0, top, width, height - top)
         ctx.slide.element.render(ctx, rect)
@@ -179,7 +179,7 @@ class Theme:
             x = rect.x2
         else:
             raise Exception("Invalid align")
-        self.draw_text(ctx.renderer, x, rect.y, text.content, style)
+        self.draw_text(ctx, x, rect.y, text.content, style)
 
     def gather_text_queries(self, ctx, queries, text):
         query = self._get_text_size_query(ctx, text.content, text.role)
@@ -196,7 +196,7 @@ class Theme:
         style = self._get_text_style(ctx, "shell")
         self._draw_line_emphasis(
             ctx, rect, style, shell.emphasis, self.shell_background_emph_color)
-        self.draw_text(ctx.renderer, rect.x, rect.y, shell.content, style)
+        self.draw_text(ctx, rect.x, rect.y, shell.content, style)
 
     def gather_shell_queries(self, ctx, queries, shell):
         query = self._get_text_size_query(ctx, shell.content, "shell")
@@ -213,7 +213,7 @@ class Theme:
         style = self._get_text_style(ctx, "code")
         self._draw_line_emphasis(
             ctx, rect, style, code.emphasis, self.code_background_emph_color)
-        self.draw_text(ctx.renderer, rect.x, rect.y, code.content, style)
+        self.draw_text(ctx, rect.x, rect.y, code.content, style)
 
     def gather_code_queries(self, ctx, queries, code):
         query = self._get_text_size_query(ctx, code.content, "code")
@@ -267,7 +267,7 @@ class Theme:
         style = self._get_text_style(ctx, None)
 
         def draw_item(element, r):
-            self.draw_text(ctx.renderer, rect.x, r.y, "\u2022", style)
+            self.draw_text(ctx, rect.x, r.y, "\u2022", style)
             element.render(ctx, r)
 
         left_padding = 15
@@ -291,8 +291,7 @@ class Theme:
         ctx.renderer.draw_rect(r, self.frame_title_color)
         style = self._get_text_style(ctx, "frame_title")
         self.draw_text(
-            ctx.renderer, rect.x + rect.width - 20, rect.y + 5,
-            frame.title, style)
+            ctx, rect.x + rect.width - 20, rect.y + 5, frame.title, style)
         rect = rect.shrink(0, 0, 80, 0)
         frame.box.render(ctx, rect)
 
@@ -369,7 +368,7 @@ class Theme:
             text = parse_text(text)
         style = self._get_text_style(ctx, role)
         key = ctx.renderer.get_text_size_query_key(
-            style, self.text_styles, text)
+            style, ctx.text_styles, text)
         width, height = ctx.get_query(key)
         offset_x, offset_y = self.get_text_offset(style)
         return width + offset_x * 2, height + offset_y * 2
@@ -378,7 +377,7 @@ class Theme:
         if isinstance(text, str):
             text = parse_text(text)
         style = self._get_text_style(ctx, role)
-        return ctx.renderer.get_text_size_query(style, self.text_styles, text)
+        return ctx.renderer.get_text_size_query(style, ctx.text_styles, text)
 
     def _draw_line_emphasis(self, ctx, rect, style, emphasis, default_color):
         for line_numbers, (start, end), color in emphasis:
@@ -393,14 +392,14 @@ class Theme:
                     ctx.renderer.draw_rect(r, color)
 
     def _get_text_style(self, ctx, role):
-        styles = [self.text_styles["default"]]
+        styles = [ctx.text_styles["default"]]
         for obj in ctx.stack:
             if isinstance(obj, Frame):
-                styles.append(self.text_styles["frame"])
+                styles.append(ctx.text_styles["frame"])
             if isinstance(obj, Box) and obj.role == "list_item":
-                styles.append(self.text_styles["list_item"])
+                styles.append(ctx.text_styles["list_item"])
         if role is not None:
-            styles.append(self.text_styles[role])
+            styles.append(ctx.text_styles[role])
         if ctx.stack[-1].text_style:
             styles.append(ctx.stack[-1].text_style)
         return merge(styles)

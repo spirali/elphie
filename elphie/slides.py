@@ -2,6 +2,7 @@
 from elphie.svg import RendererSVG, run_inkscape
 from elphie.elements import Box
 from elphie.theme import Theme
+from elphie.textstyle import TextStyle
 
 import hashlib
 import subprocess
@@ -32,13 +33,22 @@ class Slide:
 
 class Context(object):
 
-    def __init__(self, renderer, theme, slide, step, query_cache):
+    def __init__(self,
+                 renderer,
+                 theme,
+                 slide,
+                 step,
+                 query_cache,
+                 text_styles):
         self.renderer = renderer
         self.theme = theme
         self.slide = slide
         self.step = step
         self.stack = []
         self.query_cache = query_cache
+        self.text_styles = theme.text_styles.copy()
+        for name, style in text_styles.items():
+            self.text_styles[name] = style
 
     def get_query(self, key):
         try:
@@ -76,6 +86,7 @@ class Slides:
         self.width = width
         self.height = height
         self.cache_dir = cache_dir
+        self.user_defined_text_styles = {}
 
     def new_slide(self, title=None, theme=None):
         return self._make_slide(title, theme).element
@@ -129,7 +140,8 @@ class Slides:
         query_cache = {}
 
         for slide in self.slides:
-            ctx = Context(renderer, slide.theme, slide, None, None)
+            ctx = Context(renderer, slide.theme, slide, None, None,
+                          self.user_defined_text_styles)
             for query in slide.gather_queries(ctx):
                 key = query[0]
                 value = old_query_cache.get(key)
@@ -162,7 +174,8 @@ class Slides:
                 renderer = RendererSVG()
                 renderer.begin(self.width, self.height)
                 ctx = Context(
-                    renderer, slide.theme, slide, step + 1, query_cache)
+                    renderer, slide.theme, slide, step + 1, query_cache,
+                    self.user_defined_text_styles)
                 contexts.append(ctx)
 
         # Build uncached slides
@@ -190,6 +203,11 @@ class Slides:
         args += ["cat", "output", self.filename]
         subprocess.call(args)
         self._show_progress("Creating '{}'".format(self.filename), last=True)
+
+    def set_style(self, name, style):
+        assert isinstance(name, str)
+        assert isinstance(style, TextStyle)
+        self.user_defined_text_styles[name] = style
 
     def convert_to_pdf(self, source, target):
         run_inkscape(("-A", target), stdin=source)

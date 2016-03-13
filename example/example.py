@@ -120,6 +120,10 @@ slide.text(text)
 text = slide.text("Fixed size 15, ignore theme: " + text)
 text.text_style = elphie.TextStyle(size=15)
 
+slides.set_style("my_red", elphie.TextStyle(color="red"))
+slides.set_style("my_blue", elphie.TextStyle(color="blue"))
+slides.set_style("my_green", elphie.TextStyle(color="green"))
+slide.text("~my_red{red} ~my_green{green} ~my_blue{blue}")
 
 slide = slides.new_slide("Proceduraly generated elements")
 
