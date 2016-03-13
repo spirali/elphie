@@ -24,6 +24,9 @@ class Theme:
     shell_background_color = "#101010"
     shell_background_emph_color = "#76a810"
 
+    separator_thickness = 2
+    separator_color = "#005000"
+
     def __init__(self):
         default_style = TextStyle()
         default_style.font = "Ubuntu"
@@ -109,9 +112,12 @@ class Theme:
     def draw_text(self, ctx, x, y, text, style):
         if isinstance(text, str):
             text = parse_text(text)
-        # ctx.renderer.draw_rect(rect, fill_color="blue")
         offset_x, offset_y = self.get_text_offset(style)
-        ctx.renderer.draw_text(x + offset_x,
+        if style.align == "left":
+            x += offset_x
+        elif style.align == "right":
+            x -= offset_x
+        ctx.renderer.draw_text(x,
                                y + style.size + offset_y,
                                text,
                                style,
@@ -189,7 +195,7 @@ class Theme:
 
     def get_shell_size_request(self, ctx, shell):
         width, height = self._get_text_size(ctx, shell.content, "shell")
-        return SizeRequest(width, height, 1, 0)
+        return SizeRequest(width, height, 0, 0)
 
     def render_shell(self, ctx, rect, shell):
         ctx.renderer.draw_rect(rect, self.shell_background_color)
@@ -206,7 +212,7 @@ class Theme:
 
     def get_code_size_request(self, ctx, code):
         width, height = self._get_text_size(ctx, code.content, "code")
-        return SizeRequest(width, height, 1, 0)
+        return SizeRequest(width, height, 0, 0)
 
     def render_code(self, ctx, rect, code):
         ctx.renderer.draw_rect(rect, self.code_background_color)
@@ -222,10 +228,9 @@ class Theme:
     # Box
 
     def render_box(self, ctx, rect, box):
-        x_fill = (box.role == "list_item")
         for layer in box.layers:
             self._make_rects_vertical(
-                ctx, rect, layer, 10, x_fill,
+                ctx, rect, layer, 10, False,
                 lambda e, r: e.render(ctx, r))
 
     def get_box_size_request(self, ctx, box):
@@ -299,6 +304,27 @@ class Theme:
         query = self._get_text_size_query(ctx, frame.title, "frame_title")
         queries.append(query)
 
+    # Separator
+
+    def get_separator_size_request(self, ctx, separator):
+        thickness = separator.thickness
+        if thickness is None:
+            thickness = self.separator_thickness
+        if separator.horizontal:
+            return SizeRequest(0, thickness, 1, 0)
+        else:
+            return SizeRequest(thickness, 0, 0, 1)
+
+    def render_separator(self, ctx, rect, separator):
+        thickness = separator.thickness
+        if thickness is None:
+            thickness = self.separator_thickness
+        if separator.horizontal:
+            r = Rect(rect.x, rect.y, rect.width, thickness)
+        else:
+            r = Rect(rect.x, rect.y, thickness, rect.height)
+        ctx.renderer.draw_rect(r, self.separator_color)
+
     # Elements helping functions
 
     def _get_size_requests(self, ctx, elements):
@@ -332,7 +358,7 @@ class Theme:
 
         y = rect.y + (rect.height - height) / 2.0
         for rq, e in zip(requests, elements):
-            if fill_x:
+            if rq.fill_x or fill_x:
                 w = rect.width
                 x = rect.x
             else:
@@ -352,7 +378,7 @@ class Theme:
         assert fill_x == 0
         x = rect.x + (rect.width - width) / 2.0
         for rq, e in zip(requests, elements):
-            if fill_y:
+            if rq.fill_y or fill_y:
                 h = rect.height
                 y = rect.y
             else:

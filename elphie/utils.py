@@ -85,6 +85,7 @@ class SizeRequest(object):
         return "<SizeRequest {0.width}x{0.height} " \
                "{0.fill_x}x{0.fill_y}>".format(self)
 
+
 def merge_size_requests(requests):
     if len(requests) == 1:
         return requests[0]

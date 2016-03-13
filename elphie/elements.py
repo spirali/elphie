@@ -222,6 +222,11 @@ class Box(Element):
         self.add(element)
         return element
 
+    def separator(self, thickness=None, show=1):
+        element = Separator(True, thickness, show)
+        self.add(element)
+        return element
+
     def get_size_request(self, ctx):
         return ctx.theme.get_box_size_request(ctx, self)
 
@@ -376,8 +381,28 @@ class Columns(Element):
         self.ratios.append(ratio)
         return box
 
+    def separator(self, thickness=None, show=1):
+        separator = Separator(False, thickness, show)
+        self.elements.append(separator)
+        self.ratios.append(0)
+        return separator
+
     def get_size_request(self, ctx):
         return ctx.theme.get_columns_size_request(ctx, self)
 
     def render_body(self, ctx, rect):
         ctx.theme.render_columns(ctx, rect, self)
+
+
+class Separator(Element):
+
+    def __init__(self, horizontal, thickness, show):
+        super().__init__(show)
+        self.horizontal = horizontal
+        self.thickness = thickness
+
+    def get_size_request(self, ctx):
+        return ctx.theme.get_separator_size_request(ctx, self)
+
+    def render_body(self, ctx, rect):
+        return ctx.theme.render_separator(ctx, rect, self)

@@ -85,7 +85,7 @@ subslide.text("Preprocessing is cached", show=(2, 2))
 subslide.new_layer()
 subslide.text("Building is also cached", show=(3, 3))
 subslide.new_layer()
-subslide.text("This is demonstration of ~emph{layers}", show=4)
+subslide.text("This line is a demonstration of ~emph{layers}", show=4)
 
 
 slide = slides.new_slide("Columns")
@@ -109,6 +109,22 @@ frame.text("This text is in the frame!")
 lst = frame.list()
 lst.item().text("First bullet")
 lst.item().text("Second bullet")
+
+
+slide = slides.new_slide("Separators")
+
+slide.text("This is line 1")
+slide.separator()
+slide.text("This is line 2")
+slide.separator(thickness=10)
+slide.text("Under a thick separator")
+
+columns = slide.columns()
+columns.column().text("Column 1\n" * 4)
+columns.separator()
+columns.column().text("Column 2\n" * 4)
+columns.separator(thickness=10)
+columns.column().text("Column 3\n" * 4)
 
 
 slide = slides.new_slide("Text styles")
