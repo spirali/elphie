@@ -84,3 +84,12 @@ class SizeRequest(object):
     def __repr__(self):
         return "<SizeRequest {0.width}x{0.height} " \
                "{0.fill_x}x{0.fill_y}>".format(self)
+
+def merge_size_requests(requests):
+    if len(requests) == 1:
+        return requests[0]
+    width = max(r.width for r in requests)
+    height = max(r.height for r in requests)
+    fill_x = max(r.fill_x for r in requests)
+    fill_y = max(r.fill_y for r in requests)
+    return SizeRequest(width, height, fill_x, fill_y)

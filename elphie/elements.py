@@ -148,30 +148,35 @@ class Shell(TextBase):
         ctx.theme.gather_shell_queries(ctx, queries, self)
 
 
-class Container(Element):
-
-    def __init__(self, show):
-        super().__init__(show)
-        self.elements = []
-
-    @property
-    def childs(self):
-        return self.elements
-
-    def get_max_step(self):
-        steps = [element.get_max_step() for element in self.elements]
-        steps.append(super().get_max_step())
-        return max(steps)
-
-
-class Box(Container):
+class Box(Element):
 
     def __init__(self, role, show=1):
         super().__init__(show)
         self.role = role
+        self.layers = [[]]
+
+    @property
+    def childs(self):
+        return sum(self.layers, [])
+
+    def get_max_step(self):
+        steps = [element.get_max_step()
+                 for layer in self.layers
+                 for element in layer]
+        steps.append(super().get_max_step())
+        return max(steps)
+
+    def new_layer(self):
+        self.layers.append([])
+        return self
 
     def add(self, element):
-        self.elements.append(element)
+        self.layers[-1].append(element)
+
+    def box(self, show=1):
+        element = Box(show)
+        self.add(element)
+        return element
 
     def text(self, text, role=None, show=1):
         element = Text(text, role, show)
@@ -349,11 +354,21 @@ class Frame(Element):
         ctx.theme.gather_frame_queries(ctx, queries, self)
 
 
-class Columns(Container):
+class Columns(Element):
 
     def __init__(self, show):
         super().__init__(show)
+        self.elements = []
         self.ratios = []
+
+    @property
+    def childs(self):
+        return self.elements
+
+    def get_max_step(self):
+        steps = [element.get_max_step() for element in self.elements]
+        steps.append(super().get_max_step())
+        return max(steps)
 
     def column(self, ratio=1, show=1):
         box = Box("list_item", show)

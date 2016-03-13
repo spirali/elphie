@@ -1,5 +1,5 @@
 
-from elphie.utils import SizeRequest, Rect
+from elphie.utils import SizeRequest, Rect, merge_size_requests
 from elphie.textstyle import TextStyle, merge
 from elphie.textparser import parse_text
 from elphie.elements import Frame, Box
@@ -223,11 +223,15 @@ class Theme:
 
     def render_box(self, ctx, rect, box):
         x_fill = (box.role == "list_item")
-        self._make_rects_vertical(
-            ctx, rect, box.elements, 10, x_fill, lambda e, r: e.render(ctx, r))
+        for layer in box.layers:
+            self._make_rects_vertical(
+                ctx, rect, layer, 10, x_fill,
+                lambda e, r: e.render(ctx, r))
 
     def get_box_size_request(self, ctx, box):
-        return self._get_size_request_of_elements(ctx, box.elements, 10)
+        requests = [self._get_size_request_of_elements(ctx, layer, 10)
+                    for layer in box.layers]
+        return merge_size_requests(requests)
 
     # Columns
 

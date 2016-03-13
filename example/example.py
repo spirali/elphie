@@ -78,7 +78,15 @@ shell = slide.shell(
     "Building...................... done\n"
     "Creating 'example.pdf'........ done\n")
 shell.line_emphasis(5, show=(2, 2))
-shell.line_emphasis(6, show=3)
+shell.line_emphasis(6, show=(3, 3))
+
+subslide = slide.box()
+subslide.text("Preprocessing is cached", show=(2, 2))
+subslide.new_layer()
+subslide.text("Building is also cached", show=(3, 3))
+subslide.new_layer()
+subslide.text("This is demonstration of ~emph{layers}", show=4)
+
 
 slide = slides.new_slide("Columns")
 slide.text("Columns demonstration")

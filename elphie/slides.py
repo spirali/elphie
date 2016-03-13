@@ -200,8 +200,8 @@ class Slides:
         ctx.renderer.end()
 
         if self.debug:
-            filename = os.path.join(self.cache_dir,
-                "slide-{}-{}.svg".format(self.slides.index(ctx.slide), ctx.step))
+            filename = os.path.join(self.cache_dir, "slide-{}-{}.svg".format(
+                self.slides.index(ctx.slide), ctx.step))
             ctx.renderer.write(filename)
 
         string = ctx.renderer.to_string()
