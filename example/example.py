@@ -126,6 +126,18 @@ columns.column().text("Column 2\n" * 4)
 columns.separator(thickness=10)
 columns.column().text("Column 3\n" * 4)
 
+slide = slides.new_slide("Spacing")
+
+slide.text("Over a vertical space\n↓")
+slide.space(200)
+slide.text("↑\nUnder a vertical space")
+
+columns = slide.columns()
+text = columns.column().text("Space →\nbetween→\ncolumns →")
+text.text_style = elphie.TextStyle(align="right")
+columns.space(500)
+text = columns.column().text("← Space\n← between\n← columns")
+text.text_style = elphie.TextStyle(align="left")
 
 slide = slides.new_slide("Text styles")
 slide.h1("Header 1")

@@ -3,6 +3,7 @@ from elphie.textparser import parse_text
 import xml.etree.ElementTree as et
 import elphie.svg as svg
 from elphie.highlight import highlight_code
+from elphie.utils import SizeRequest
 
 from copy import deepcopy
 
@@ -222,6 +223,11 @@ class Box(Element):
         self.add(element)
         return element
 
+    def space(self, height, width=0):
+        element = Space(width, height)
+        self.add(element)
+        return element
+
     def separator(self, thickness=None, show=1):
         element = Separator(True, thickness, show)
         self.add(element)
@@ -381,6 +387,12 @@ class Columns(Element):
         self.ratios.append(ratio)
         return box
 
+    def space(self, width, height=0):
+        element = Space(width, height)
+        self.elements.append(element)
+        self.ratios.append(0)
+        return element
+
     def separator(self, thickness=None, show=1):
         separator = Separator(False, thickness, show)
         self.elements.append(separator)
@@ -406,3 +418,17 @@ class Separator(Element):
 
     def render_body(self, ctx, rect):
         return ctx.theme.render_separator(ctx, rect, self)
+
+
+class Space(Element):
+
+    def __init__(self, width, height):
+        super().__init__(1)
+        self.width = width
+        self.height = height
+
+    def get_size_request(self, ctx):
+        return SizeRequest(self.width, self.height)
+
+    def render_body(self, ctx, rect):
+        pass
