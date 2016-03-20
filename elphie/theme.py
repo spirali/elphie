@@ -439,3 +439,9 @@ class BlueTheme(Theme):
 
     frame_title_color = major_color
     frame_bg_color = "#aaaaff"
+
+    code_background_color = "#F0F0F0"
+    code_background_emph_color = "#c0c0FF"
+
+    separator_color = "#000060"
+
