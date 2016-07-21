@@ -8,6 +8,7 @@ from elphie.highlight import make_style
 
 class Theme:
 
+    bg_color = "white"
     major_color = "#86c800"
     minor_color = "#d2d9bd"
     text_color = "#86b800"
@@ -129,6 +130,9 @@ class Theme:
         width = renderer.width
         height = renderer.height
 
+        slide_rect = Rect(0, 0, width, height)
+        renderer.draw_rect(slide_rect, self.bg_color)
+
         if slide.role == "title":
             title = slide.title
             if title is None:
@@ -146,11 +150,10 @@ class Theme:
                            slide.title,
                            style)
             top = height / 2 + style.size
-            ctx.slide.element.render(ctx, Rect(0, top, width, height - top))
             return
 
         if slide.title is None:
-            ctx.slide.element.render(ctx, Rect(0, 0, width, height))
+            ctx.slide.element.render(ctx, slide_rect)
             return
 
         top = 80
