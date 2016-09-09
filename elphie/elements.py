@@ -325,6 +325,11 @@ class List(Element):
         self.elements = []
         self.show = show
 
+    def get_max_step(self):
+        steps = [element.get_max_step() for element in self.elements]
+        steps.append(super().get_max_step())
+        return max(steps)
+
     @property
     def childs(self):
         return self.elements
