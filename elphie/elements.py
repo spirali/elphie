@@ -68,6 +68,14 @@ class TextBase(Element):
             ends.append(end)
         return max(ends)
 
+    def consecutive_line_emphasis(
+            self, start=1, predicate_fn=None, color=None):
+        step = start
+        for i, line in enumerate(self.text.split("\n")):
+            if predicate_fn is None or predicate_fn(i, line):
+                self.line_emphasis(i + 1, (step, step), color=color)
+                step += 1
+
     def line_emphasis(self,
                       line_numbers=None,
                       show=1,
