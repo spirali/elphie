@@ -61,7 +61,7 @@ class TextBase(Element):
 
     def get_max_step(self):
         start, end = normalize_show(self.show)
-        ends = [start - 1 + (e if e is not None else s)
+        ends = [e if e is not None else s
                 for line_number, (s, e), color in self.emphasis]
         ends.append(start)
         if end:
