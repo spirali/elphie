@@ -12,7 +12,7 @@ class Theme:
     major_color = "#86c800"
     minor_color = "#d2d9bd"
     text_color = "#86b800"
-    text_empth_color = "#f6b800"
+    text_emph_color = "#f6b800"
     text_alert_color = "#ff2800"
 
     frame_title_color = major_color
@@ -55,7 +55,7 @@ class Theme:
         shell_cmd_style.bold = True
 
         emph_style = TextStyle()
-        emph_style.color = self.text_empth_color
+        emph_style.color = self.text_emph_color
         emph_style.italic = True
 
         alert_style = TextStyle()
@@ -439,6 +439,8 @@ class BlueTheme(Theme):
     major_color = "#4040aa"
     minor_color = "#404088"
     text_color = "#000080"
+    text_emph_color = "#60b8f0"
+
 
     frame_title_color = major_color
     frame_bg_color = "#aaaaff"
