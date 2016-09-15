@@ -1,7 +1,7 @@
 # Elphie
 
-Elphie is a presentation framework 
-based on Python and Inkscape.
+Elphie is a framework for making slides.
+It is based on Python and Inkscape.
 
 Example: [example.pdf](example/example.pdf), [example.py](example/example.py)
 
