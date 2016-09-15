@@ -298,16 +298,16 @@ class Image(Element):
 
     def get_data(self, step):
         hidden = []
+
         def find_hidden_elements(element):
-            for child in list(element):
+            for child in element:
                 value = _parse_label(child)
                 if value is not None:
                     start, end = value
                     if step < start or (end is not None and step > end):
                         hidden.append((element, child))
                         continue
-                else:
-                    find_hidden_elements(child)
+                find_hidden_elements(child)
 
         if not self.has_inner_steps:
             return et.tostring(self.root).decode()
