@@ -11,6 +11,7 @@ Example: [example.pdf](example/example.pdf), [example.py](example/example.py)
 * Inkscape
 * pdftk
 * pygments
+* lxml
 
 # Installation
 

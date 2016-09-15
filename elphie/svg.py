@@ -1,6 +1,6 @@
 from elphie.sxml import Xml
 
-import xml.etree.ElementTree as et
+import lxml.etree as et
 import subprocess
 
 

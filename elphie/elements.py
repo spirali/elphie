@@ -1,6 +1,6 @@
 
 from elphie.textparser import parse_text
-import xml.etree.ElementTree as et
+import lxml.etree as et
 import elphie.svg as svg
 from elphie.highlight import highlight_code
 from elphie.utils import SizeRequest
@@ -297,23 +297,26 @@ class Image(Element):
         return self.max_step
 
     def get_data(self, step):
-        def remove_hidden_elements(element):
+        hidden = []
+        def find_hidden_elements(element):
             for child in list(element):
                 value = _parse_label(child)
                 if value is not None:
                     start, end = value
                     if step < start or (end is not None and step > end):
-                        element.remove(child)
+                        hidden.append((element, child))
                         continue
                 else:
-                    remove_hidden_elements(child)
+                    find_hidden_elements(child)
 
         if not self.has_inner_steps:
             return et.tostring(self.root).decode()
 
         step -= self.start_step - 1
         root = deepcopy(self.root)
-        remove_hidden_elements(root)
+        find_hidden_elements(root)
+        for element, child in hidden:
+            element.remove(child)
         return et.tostring(root).decode()
 
     def get_size_request(self, ctx):
