@@ -253,7 +253,3 @@ class Slides:
     def _get_cached_pdf(self):
         return [filename for filename in os.listdir(self.cache_dir)
                 if filename.endswith(".pdf")]
-
-    def main(self):
-        theme = Theme()
-        self.render(theme)
