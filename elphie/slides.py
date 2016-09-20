@@ -9,6 +9,7 @@ import subprocess
 import os
 import sys
 import pickle
+import argparse
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -39,13 +40,15 @@ class Context(object):
                  slide,
                  step,
                  query_cache,
-                 text_styles):
+                 text_styles,
+                 workers=None):
         self.renderer = renderer
         self.theme = theme
         self.slide = slide
         self.step = step
         self.stack = []
         self.query_cache = query_cache
+        self.workers = workers
         self.text_styles = theme.text_styles.copy()
         for name, style in text_styles.items():
             self.text_styles[name] = style
@@ -56,7 +59,7 @@ class Context(object):
         except KeyError:
             print("Queries:")
             for q in self.query_cache:
-                print (q)
+                print(q)
             print("Searching for: ", key)
             raise Exception("Invalid query key")
 
@@ -69,14 +72,15 @@ class Context(object):
 
 class Slides:
 
-    debug = False
-
     def __init__(self,
                  filename,
                  theme=None,
                  width=1024,
                  height=768,
-                 cache_dir="./elphie-cache"):
+                 cache_dir="./elphie-cache",
+                 parse_args=True,
+                 debug=False,
+                 threads=None):
         self.filename = filename
         self.slides = []
         if theme:
@@ -87,6 +91,11 @@ class Slides:
         self.height = height
         self.cache_dir = cache_dir
         self.user_defined_text_styles = {}
+        self.debug = debug
+        self.threads = threads
+
+        if parse_args:
+            self._parse_args()
 
     def new_slide(self, title=None, theme=None):
         return self._make_slide(title, theme).element
@@ -152,8 +161,10 @@ class Slides:
         queries = dict(queries)
 
         # Create threads
-        workers = os.cpu_count() or 1
-        pool = ThreadPoolExecutor(workers)
+        threads = self.threads
+        if threads is None:
+            threads = os.cpu_count() or 1
+        pool = ThreadPoolExecutor(threads)
 
         # Process new queries
         self._show_progress("Preprocessing", first=True)
@@ -253,3 +264,18 @@ class Slides:
     def _get_cached_pdf(self):
         return [filename for filename in os.listdir(self.cache_dir)
                 if filename.endswith(".pdf")]
+
+    def _parse_args(self):
+        parser = argparse.ArgumentParser(description="Elphie")
+        parser.add_argument("--debug",
+                            action="store_true",
+                            default=self.debug,
+                            help="Enable debug mode")
+        parser.add_argument("--threads",
+                            type=int,
+                            default=self.threads,
+                            help="Number of used threads "
+                                 "(default: autodetect)")
+        args = parser.parse_args()
+        self.debug = args.debug
+        self.threads = args.threads
