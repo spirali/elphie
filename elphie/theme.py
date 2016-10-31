@@ -150,6 +150,8 @@ class Theme:
                            slide.title,
                            style)
             top = height / 2 + style.size
+            slide_rect = Rect(0, top, width, height - top)
+            ctx.slide.element.render(ctx, slide_rect)
             return
 
         if slide.title is None:
