@@ -277,7 +277,8 @@ class Theme:
         style = self._get_text_style(ctx, None)
 
         def draw_item(element, r):
-            self.draw_text(ctx, rect.x, r.y, "\u2022", style)
+            if element.is_visible(ctx):
+                self.draw_text(ctx, rect.x, r.y, "\u2022", style)
             element.render(ctx, r)
 
         left_padding = 15
