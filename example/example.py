@@ -69,6 +69,28 @@ int main() {
 code.text_style = elphie.TextStyle(size=20)
 code.line_emphasis([5, 6, 7], show=6, color="#f0c080")
 
+slide = slides.new_slide("Code (fill_x)")
+code = slide.code("""#include <stdio.h>
+
+/* Hello world program */
+
+int main() {
+    printf("Hello world!\\n");
+    return 0;
+}""", "c")
+code.fill_x = 1
+
+code = slide.code("""#include <stdio.h>
+
+/* Hello world program */
+
+int main() {
+    printf("Hello world!\\n");
+    return 0;
+}""", "c")
+code.text_style = elphie.TextStyle(size=20)
+code.fill_x = 1
+
 slide = slides.new_slide("Shell")
 shell = slide.shell(
     "~shell_prompt{/path/to/elphie/example$} ~shell_cmd{ls}\n"

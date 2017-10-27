@@ -20,6 +20,7 @@ class Element:
 
     childs = ()
     text_style = None
+    fill_x = 0
 
     def __init__(self, show):
         self.show = show

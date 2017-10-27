@@ -217,7 +217,7 @@ class Theme:
 
     def get_code_size_request(self, ctx, code):
         width, height = self._get_text_size(ctx, code.content, "code")
-        return SizeRequest(width, height, 0, 0)
+        return SizeRequest(width, height, code.fill_x, 0)
 
     def render_code(self, ctx, rect, code):
         ctx.renderer.draw_rect(rect, self.code_background_color)
