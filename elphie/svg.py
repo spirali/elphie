@@ -123,6 +123,7 @@ def render_text(xml, x, y, parsed_text, style, styles, id=None):
 
     if id is not None:
         xml.set("id", id)
+
     xml.set("x", x)
     xml.set("y", y)
 

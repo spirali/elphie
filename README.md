@@ -1,3 +1,5 @@
+# DEPRECATED in favor of https://github.com/spirali/elsie/
+
 # Elphie
 
 Elphie is a framework for making slides.
